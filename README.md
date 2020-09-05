@@ -1,0 +1,2 @@
+# Policy-Based-Routing
+ Policy-Based Routing is configured using the ACLs and route maps, and it provides a network engineer with the ability to dictate the routing behavior based on several different criteria other than destination network, including source or destination network, source or destination address, source or destination port, protocol, packet size, and packet classification among others.

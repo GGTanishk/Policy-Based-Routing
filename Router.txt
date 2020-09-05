@@ -1,0 +1,81 @@
+hostname Router
+boot-start-marker
+boot-end-marker
+no aaa new-model
+memory-size iomem 10
+ip cef
+ip dhcp excluded-address 192.168.1.1
+ip dhcp excluded-address 192.168.2.1
+ip dhcp pool LOCAL-HOST
+ network 192.168.1.0 255.255.255.0
+ default-router 192.168.1.1
+ domain-name ccnp-lab.com
+ip dhcp pool HTTP/HTTPS
+ network 192.168.2.0 255.255.255.0
+ default-router 192.168.2.1
+ domain-name ccnp-lab.com
+no ipv6 cef
+multilink bundle-name authenticated
+voice-card 0
+license udi pid CISCO2901/K9 sn FTX15208074
+license accept end user agreement
+license boot module c2900 technology-package securityk9
+license boot module c2900 technology-package uck9
+vtp domain cisco
+vtp mode transparent
+redundancy
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+interface GigabitEthernet0/0
+ ip address 192.168.1.1 255.255.255.0
+ ip policy route-map POLICY
+ duplex auto
+ speed auto
+interface GigabitEthernet0/1
+ ip address 192.168.2.1 255.255.255.0
+ duplex auto
+ speed auto
+interface Serial0/0/0
+ no ip address
+ shutdown
+ clock rate 2000000
+interface Serial0/0/1
+ no ip address
+ shutdown
+ clock rate 2000000
+interface GigabitEthernet0/1/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ip forward-protocol nd
+no ip http server
+no ip http secure-server
+access-list 101 permit tcp host 192.168.1.2 host 192.168.2.3 eq 443
+access-list 101 permit tcp host 192.168.1.2 host 192.168.2.4 eq www
+access-list 102 permit tcp host 192.168.1.2 host 192.168.2.3 eq www
+access-list 102 permit tcp host 192.168.1.2 host 192.168.2.4 eq 443
+route-map POLICY permit 10
+ match ip address 101
+ set interface GigabitEthernet0/1
+route-map POLICY permit 20
+ match ip address 102
+ set interface Null0
+control-plane
+mgcp profile default
+gatekeeper
+ shutdown
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output lat pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ login
+ transport input all
+scheduler allocate 20000 1000
+end
